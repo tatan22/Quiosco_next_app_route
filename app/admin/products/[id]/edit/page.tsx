@@ -14,9 +14,12 @@ async function getProducts(id: number) {
 	});
 	return product;
 }
-export default async function EditProductsPage({params}: {params: { id: string };
+export default async function EditProductsPage({
+	params,
+}: {
+	params: Promise<{ id: string }>;
 }) {
-	const { id } = params; //-- 👈 aquí está la magia
+	const { id } = await params; //-- 👈 aquí está la magia
 	const product = await getProducts(parseInt(id));
 	if (!product) {
 		// redirect('/404')
