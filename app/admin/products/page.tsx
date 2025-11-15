@@ -28,9 +28,10 @@ export type ProductsWithCategory = Awaited<ReturnType<typeof getProducts>>;
 export default async function ProductsPage({
 	searchParams,
 }: {
-	searchParams?: { page?: string };
+	searchParams?: Promise<{ page?: string }>; // ← PROMISE
 }) {
-	const rawPage = searchParams?.page;
+	const resolvedSearchParams = await searchParams; // ← AWAIT
+	const rawPage = resolvedSearchParams?.page;
 	const page = rawPage ? Number(rawPage) : 1;
 	const pageSize = 10;
 
@@ -43,7 +44,10 @@ export default async function ProductsPage({
 		totalProductsData,
 	]);
 	const totalPages = Math.ceil(totalProducts / pageSize);
-	if (!products.length) redirect("/admin/products");
+
+	if (page > totalPages && totalPages > 0) {
+		redirect("/admin/products");
+	}
 
 	return (
 		<>
@@ -52,7 +56,7 @@ export default async function ProductsPage({
 			<div className="flex flex-col lg:flex-row gap-5 justify-between">
 				<Link
 					href={`/admin/products/new`}
-					className="bg-amber-400 w-full lg:w-auto text-xl px-10 py-3 text-center font-bolt cursor-pointer"
+					className="bg-amber-400 w-full lg:w-auto text-xl px-10 py-3 text-center font-bold cursor-pointer"
 				>
 					Crear Producto
 				</Link>
